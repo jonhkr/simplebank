@@ -71,7 +71,7 @@ defmodule UserTest do
     username = "jonast"
     password = "jonast"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, _} = Users.create_user(name, username, password)
 
     {:ok, session} = Users.create_session(username, password)
 
