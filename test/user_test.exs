@@ -51,4 +51,43 @@ defmodule UserTest do
                [count: 6, validation: :length, kind: :min]}
             ] = errors
   end
+
+  test "create session" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    {:ok, user} = Users.create_user(name, username, password)
+
+    {:ok, session} = Users.create_session(username, password)
+
+    assert session.id != nil
+    assert session.user_id == user.id
+    assert session.revoked_at == nil
+  end
+
+  test "revoke session" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    {:ok, user} = Users.create_user(name, username, password)
+
+    {:ok, session} = Users.create_session(username, password)
+
+    Users.revoke_session(session.id)
+
+    revoked = Users.get_session(session.id)
+
+    assert revoked.id == session.id
+    assert revoked.revoked_at != nil
+
+    assert !Users.valid_session(session.id)
+
+    Users.revoke_session(session.id)
+
+    revoked2 = Users.get_session(session.id)
+
+    assert revoked.revoked_at == revoked2.revoked_at
+  end
 end

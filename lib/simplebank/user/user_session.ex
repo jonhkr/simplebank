@@ -4,7 +4,7 @@ defmodule SimpleBank.UserSession do
 
   @derive {Jason.Encoder, only: [:id, :user_id, :inserted_at, :revoked_at]}
   schema "user_session" do
-    field :user_id, Ecto.UUID
+    field :user_id, :integer
     field :revoked_at, :utc_datetime_usec
 
     timestamps()
@@ -19,11 +19,11 @@ defmodule SimpleBank.UserSession do
     |> revoke_if_necessary(params[:revoke])
   end
 
-  defp revoke_if_necessary(user_session, revoke) do
-    if revoke do
-      put_change(user_session, :revoked_at, DateTime.utc_now())
+  defp revoke_if_necessary(changeset, revoke) do
+    if !!revoke && (get_field(changeset, :revoked_at) |> is_nil) do
+      put_change(changeset, :revoked_at, DateTime.utc_now())
+    else
+      changeset
     end
-
-    user_session
   end
 end

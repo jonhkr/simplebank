@@ -17,6 +17,28 @@ defmodule SimpleBank.Users do
     end
   end
 
+  def revoke_session(session_id) do
+    case get_session(session_id) do
+      nil -> false
+      session -> 
+        session
+        |> UserSession.changeset(%{revoke: true})
+        |> Repo.update()
+    end
+  end
+
+  def get_session(session_id) do
+    Repo.get(UserSession, session_id)
+  end
+
+  def valid_session(session_id) do
+    case get_session(session_id) do
+      nil -> false
+      %UserSession{revoked_at: nil} -> true
+      _ -> false
+    end
+  end
+
   defp create_session(user) do
     %UserSession{}
     |> UserSession.changeset(%{user_id: user.id})
