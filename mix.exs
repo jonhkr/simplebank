@@ -28,6 +28,7 @@ defmodule SimpleBank.MixProject do
       {:mariaex, ">= 0.0.0"},
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 1.1"},
+      {:joken, "~> 2.0-rc3"},
     ]
   end
 end

@@ -2,7 +2,7 @@ defmodule UserApiTest do
   use ExUnit.Case
   use Plug.Test
 
-  alias SimpleBank.{Repo, Router}
+  alias SimpleBank.{Repo, Router, Users, Auth}
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -49,5 +49,83 @@ defmodule UserApiTest do
 
     assert id != nil
     assert inserted_at != nil
+  end
+
+  test "create user session" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    {:ok, user} = Users.create_user(name, username, password)
+
+    req_body = %{"username" => username, "raw_password" => password}
+
+    conn =
+      conn(:post, "/v1/sessions", Jason.encode!(req_body))
+      |> put_req_header("content-type", "application/json")
+      |> Router.call(@opts)
+
+    assert conn.status == 200
+
+    assert %{"session_token" => token} = Jason.decode!(conn.resp_body)
+
+    {:ok, session_user} = Auth.validate_and_get_user(token)
+
+    assert user.id == session_user.id
+  end
+
+  test "authentication error" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    req_body = %{"username" => username, "raw_password" => password}
+
+    conn =
+      conn(:post, "/v1/sessions", Jason.encode!(req_body))
+      |> put_req_header("content-type", "application/json")
+      |> Router.call(@opts)
+
+    assert conn.status == 401
+
+    assert %{"message" => message} = Jason.decode!(conn.resp_body)
+
+    assert message == "Invalid credentials"
+  end
+
+  test "authentication with empty username" do
+    req_body = %{"username": nil}
+
+    conn =
+      conn(:post, "/v1/sessions", Jason.encode!(req_body))
+      |> put_req_header("content-type", "application/json")
+      |> Router.call(@opts)
+
+    assert conn.status == 401
+
+    assert %{"message" => message} = Jason.decode!(conn.resp_body)
+
+    assert message == "Invalid credentials"
+  end
+
+  test "authentication with empty password" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    {:ok, _} = Users.create_user(name, username, password)
+
+    req_body = %{"username" => username, "raw_password" => nil}
+
+    conn =
+      conn(:post, "/v1/sessions", Jason.encode!(req_body))
+      |> put_req_header("content-type", "application/json")
+      |> Router.call(@opts)
+
+    assert conn.status == 401
+
+    assert %{"message" => message} = Jason.decode!(conn.resp_body)
+
+    assert message == "Invalid credentials"
   end
 end

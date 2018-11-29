@@ -23,11 +23,10 @@ Request:
 POST /v1/users
 Content-Type: application/json
 
-
 {
 	"name": "Your Name",
-	"username": "your-username",
-	"raw_password": "yourpassword",
+	"username": "username",
+	"raw_password": "password",
 	"email": "Your email"
 }
 ```
@@ -44,7 +43,7 @@ Response:
 {
 	"id": 121,
 	"name": "Your Name",
-	"username": "your-username",
+	"username": "username",
 	"inserted_at": "2018-11-28T20:54:53"
 }
 ```
@@ -53,9 +52,44 @@ Curl request:
 ```
 curl -X POST http://localhost:3000/v1/users -H "content-type:application/json" -d '{
     "name": "Your name",
-    "username": "Your username",
-    "raw_password": "Your password",
+    "username": "username",
+    "raw_password": "password",
     "email": "Your email"
+}'
+```
+
+### Creating an authentication token
+
+Request:
+```
+POST /v1/sessions
+Content-Type: application/json
+
+{
+	"username": "username",
+	"raw_password": "password"
+}
+```
+
+Response:
+```
+< HTTP/1.1 200 OK
+< cache-control: max-age=0, private, must-revalidate
+< content-length: 92
+< date: Wed, 28 Nov 2018 20:54:52 GMT
+< server: Cowboy
+< x-request-id: 2llma8eep65ua5o1to0000o2
+
+{
+	"session_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0"
+}
+```
+
+Curl request:
+```
+curl -X POST http://localhost:3000/v1/sessions -H "content-type:application/json" -d '{
+    "username": "username",
+    "raw_password": "password"
 }'
 ```
 

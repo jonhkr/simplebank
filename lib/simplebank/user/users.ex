@@ -8,11 +8,17 @@ defmodule SimpleBank.Users do
     |> Repo.insert()
   end
 
+  def get_user(user_id) do
+    Repo.get(User, user_id)
+  end
+
+  def create_session(nil, _), do: {:error, :invalid_credentials}
+  def create_session(_, nil), do: {:error, :invalid_credentials}
   def create_session(username, raw_password) do
     user = Repo.get_by(User, username: username)
 
     case User.password_matches(user, raw_password) do
-      false -> {:error, "invalid credentials"}
+      false -> {:error, :invalid_credentials}
       _ -> create_session(user)
     end
   end

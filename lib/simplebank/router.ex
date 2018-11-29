@@ -3,7 +3,7 @@ defmodule SimpleBank.Router do
   use Plug.ErrorHandler
   require Logger
 
-  alias SimpleBank.{Users}
+  alias SimpleBank.{Users, Auth}
 
   plug Plug.Logger
   plug Plug.RequestId
@@ -30,6 +30,19 @@ defmodule SimpleBank.Router do
         send_resp(conn, 400, Jason.encode!(%{
           "details" => encode_changeset_errors(changeset)
         }))
+    end
+  end
+
+  post "/v1/sessions" do
+    params = conn.body_params
+    username = params["username"]
+    raw_password = params["raw_password"]
+
+    case Auth.authenticate(username, raw_password) do
+      {:ok, token} -> 
+        send_resp(conn, 200, Jason.encode!(%{session_token: token}))
+      {:error, _} -> 
+        send_resp(conn, 401, Jason.encode!(%{message: "Invalid credentials"}))
     end
   end
 

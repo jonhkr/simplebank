@@ -15,7 +15,7 @@ defmodule SimpleBank.Withdrawal do
 
   def changeset(user, params \\ :empty) do
     user
-    |> cast(params, @required_fields ++ @optinal_fields)
+    |> cast(params, @required_fields)
     |> validate_required(@required_fields)
   end
 end
