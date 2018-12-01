@@ -8,7 +8,7 @@ defmodule SimpleBank.Withdrawal do
     field :transaction_id, :integer
     field :amount, :decimal
 
-    timestamps()
+    timestamps(updated_at: false)
   end
 
   @required_fields [:account_id, :transaction_id, :amount]

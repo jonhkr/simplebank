@@ -33,6 +33,45 @@ defmodule SimpleBank.Accounts do
     Repo.one(query)
   end
 
+  def debit_account(account_id, amount, type) do
+    Repo.transaction fn ->
+      query = from a in @account_query,
+        where: a.id == ^account_id,
+        lock: "FOR UPDATE"
+
+      account = Repo.one(query)
+
+      if is_nil(account) do
+        {:error, "account not found"}
+      else
+        case create_transaction(account, negative_amount(amount), type) do
+          {:ok, transaction} -> transaction
+          {:error, error} -> Repo.rollback(error) 
+        end
+      end
+    end
+  end
+
+  defp negative_amount(amount) do
+    amount
+    |> Decimal.abs
+    |> Decimal.minus
+  end
+
+  defp create_transaction(account, amount, type) do
+    if Decimal.cmp(Decimal.add(account.balance, amount), 0) == :lt do
+      {:error, "insufficient funds"}
+    else
+      changeset = Transaction.changeset(%Transaction{}, %{
+        account_id: account.id,
+        amount: amount,
+        type: type
+      })
+
+      Repo.insert(changeset)
+    end
+  end
+
   defp gen_iban(), do: Ecto.UUID.generate()
 
   defp create_account(%Ecto.Changeset{valid?: false} = changeset, _initial_deposit), do: {:error, changeset}
@@ -48,15 +87,8 @@ defmodule SimpleBank.Accounts do
     end
   end
 
-
   defp create_initial_deposit({:error, _} = error, _initial_deposit), do: error
   defp create_initial_deposit({:ok, account}, initial_deposit) do
-    changeset = Transaction.changeset(%Transaction{}, %{
-      account_id: account.id,
-      amount: initial_deposit,
-      type: "initial_deposit"
-    })
-
-    Repo.insert(changeset)
+    create_transaction(account, initial_deposit, "initial_deposit")
   end
 end

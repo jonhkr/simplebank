@@ -7,7 +7,7 @@ defmodule SimpleBank.Account do
     field :user_id, :integer
     field :iban
     field :currency
-    field :balance, :decimal, virtual: true
+    field :balance, :decimal, virtual: true, default: 0
 
     has_many :transactions, SimpleBank.Transaction
 
