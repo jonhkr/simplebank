@@ -3,7 +3,7 @@ defmodule SimpleBank.Router do
   use Plug.ErrorHandler
   require Logger
 
-  alias SimpleBank.{Users, Auth}
+  alias SimpleBank.{Users, Auth, Accounts}
 
   plug Plug.Logger
   plug Plug.RequestId
@@ -43,6 +43,31 @@ defmodule SimpleBank.Router do
         send_resp(conn, 200, Jason.encode!(%{session_token: token}))
       {:error, _} -> 
         send_resp(conn, 401, Jason.encode!(%{message: "Invalid credentials"}))
+    end
+  end
+
+  get "/v1/accounts" do
+    case check_authorization(conn) do
+      {:ok, user} ->
+        accounts = Accounts.get_user_accounts(user.id)
+        send_resp(conn, 200, Jason.encode!(accounts))
+      {:error, _} ->
+        send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
+    end
+  end
+
+  defp check_authorization(%Plug.Conn{} = conn) do
+    conn
+    |> get_req_header("authorization")
+    |> check_authorization() 
+  end
+  defp check_authorization([]), do: {:error, :unathorized}
+  defp check_authorization([h | _]) do
+    if String.starts_with?(h, "Bearer ") do
+      String.slice(h, 7..-1)
+      |> Auth.validate_and_get_user()
+    else
+      {:error, :unauthorized}
     end
   end
 

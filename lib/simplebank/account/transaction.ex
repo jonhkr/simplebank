@@ -5,7 +5,7 @@ defmodule SimpleBank.Transaction do
   @derive {Jason.Encoder, only: [:id, :account_id, :amount, :type, :inserted_at]}
   schema "transaction" do
     field :account_id, :integer
-    field :amount
+    field :amount, :decimal
     field :type
 
     timestamps(updated_at: false)

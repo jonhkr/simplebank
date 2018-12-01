@@ -94,20 +94,53 @@ curl -X POST http://localhost:3000/v1/sessions -H "content-type:application/json
 ```
 
 
-## Installation
+### List accounts
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `simplebank` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:simplebank, "~> 0.1.0"}
-  ]
-end
+Request:
+```
+GET /v1/accounts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/simplebank](https://hexdocs.pm/simplebank).
+Response:
+```
+< HTTP/1.1 200 OK
+< cache-control: max-age=0, private, must-revalidate
+< content-length: 147
+< date: Sat, 01 Dec 2018 16:05:17 GMT
+< server: Cowboy
+< x-request-id: 2lm424ff08ia7896l80000r1
+
+[
+	{
+		"id": 290,
+		"user_id": 353,
+		"iban": "8e571614-fe31-4466-930f-4b8f7e5272a1",
+		"balance": "1000.0000",
+		"currency": "BRL",
+		"inserted_at": "2018-12-01T16:04:19"
+	}
+]
+```
+
+Curl request:
+```
+curl -X GET http://localhost:3000/v1/accounts -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0" -v
+```
+
+### Request withdrawal
+
+
+### Request transfer
+
+
+### Generate a report
+
+
+## Running
+
+
+## Monitoring
+
+
 

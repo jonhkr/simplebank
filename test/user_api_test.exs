@@ -58,7 +58,7 @@ defmodule UserApiTest do
 
     {:ok, user} = Users.create_user(name, username, password)
 
-    req_body = %{"username" => username, "raw_password" => password}
+    req_body = %{username: username, raw_password: password}
 
     conn =
       conn(:post, "/v1/sessions", Jason.encode!(req_body))
@@ -75,11 +75,10 @@ defmodule UserApiTest do
   end
 
   test "authentication error" do
-    name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
 
-    req_body = %{"username" => username, "raw_password" => password}
+    req_body = %{username: username, raw_password: password}
 
     conn =
       conn(:post, "/v1/sessions", Jason.encode!(req_body))
@@ -94,7 +93,7 @@ defmodule UserApiTest do
   end
 
   test "authentication with empty username" do
-    req_body = %{"username": nil}
+    req_body = %{username: nil}
 
     conn =
       conn(:post, "/v1/sessions", Jason.encode!(req_body))
@@ -115,7 +114,7 @@ defmodule UserApiTest do
 
     {:ok, _} = Users.create_user(name, username, password)
 
-    req_body = %{"username" => username, "raw_password" => nil}
+    req_body = %{username: username, raw_password: nil}
 
     conn =
       conn(:post, "/v1/sessions", Jason.encode!(req_body))

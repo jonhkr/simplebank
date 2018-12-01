@@ -2,11 +2,14 @@ defmodule SimpleBank.Account do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:id, :user_id, :iban, :currency, :inserted_at]}
+  @derive {Jason.Encoder, only: [:id, :user_id, :iban, :balance, :currency, :inserted_at]}
   schema "account" do
     field :user_id, :integer
     field :iban
     field :currency
+    field :balance, :decimal, virtual: true
+
+    has_many :transactions, SimpleBank.Transaction
 
     timestamps()
   end
