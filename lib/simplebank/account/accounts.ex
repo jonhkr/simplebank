@@ -1,7 +1,7 @@
 defmodule SimpleBank.Accounts do
   import Ecto.Query, only: [from: 2]
 
-  alias SimpleBank.{Repo, Account, Transaction}
+  alias SimpleBank.{Repo, Account, Transaction, Error}
 
   @account_query from a in Account,
       select: %{a | balance: coalesce(
@@ -26,6 +26,14 @@ defmodule SimpleBank.Accounts do
     Repo.all(query)
   end
 
+  def get_user_account(user_id, currency) do
+    query = from a in @account_query,
+      where: a.user_id == ^user_id and
+        a.currency == ^currency
+
+    Repo.one(query)
+  end
+
   def get_account(account_id) do
     query = from a in @account_query,
       where: a.id == ^account_id
@@ -42,7 +50,7 @@ defmodule SimpleBank.Accounts do
       account = Repo.one(query)
 
       if is_nil(account) do
-        {:error, "account not found"}
+        {:error, %Error{message: "account not found"}}
       else
         case create_transaction(account, negative_amount(amount), type) do
           {:ok, transaction} -> transaction
@@ -60,7 +68,7 @@ defmodule SimpleBank.Accounts do
 
   defp create_transaction(account, amount, type) do
     if Decimal.cmp(Decimal.add(account.balance, amount), 0) == :lt do
-      {:error, "insufficient funds"}
+      {:error, %Error{message: "insufficient funds"}}
     else
       changeset = Transaction.changeset(%Transaction{}, %{
         account_id: account.id,

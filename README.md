@@ -130,6 +130,39 @@ curl -X GET http://localhost:3000/v1/accounts -H "Authorization: Bearer eyJhbGci
 
 ### Request withdrawal
 
+Request:
+```
+POST /v1/withdrawals
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0NiwidXNlcl9pZCI6MzUzLCJleHAiOjE1NDM3MDA3MjcsImlhdCI6MTU0MzY5MzUyNywianRpIjoiMmxtNHE1ZGMwbnJxMHB2b3FjMDAwMDcyIiwibmJmIjoxNTQzNjkzNTI3fQ.-mGOu8c6lKShnbfLtp2oFGQwhQhcBVs6nr70a8Fks9E
+Content-type: application/json
+
+{
+	"amount": 100
+}
+```
+
+Response:
+```
+< HTTP/1.1 200 OK
+< cache-control: max-age=0, private, must-revalidate
+< content-length: 98
+< date: Sat, 01 Dec 2018 19:47:00 GMT
+< server: Cowboy
+< x-request-id: 2lm4qarla36psodf8o000023
+
+{
+	"id": 29,
+	"account_id": 290,
+	"transaction_id": 509,
+	"amount": "100",
+	"inserted_at": "2018-12-01T19:47:01"
+}
+```
+
+Curl request:
+```
+curl -X POST http://localhost:3000/v1/withdrawals -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0" -H "content-type:application/json" -d '{"amount": 100}' -v
+```
 
 ### Request transfer
 

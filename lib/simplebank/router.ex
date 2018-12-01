@@ -3,7 +3,7 @@ defmodule SimpleBank.Router do
   use Plug.ErrorHandler
   require Logger
 
-  alias SimpleBank.{Users, Auth, Accounts}
+  alias SimpleBank.{Users, Auth, Accounts, Withdrawals}
 
   plug Plug.Logger
   plug Plug.RequestId
@@ -28,8 +28,9 @@ defmodule SimpleBank.Router do
       {:ok, user} -> send_resp(conn, 200, Jason.encode!(user))
       {:error, %Ecto.Changeset{} = changeset} -> 
         send_resp(conn, 400, Jason.encode!(%{
-          "details" => encode_changeset_errors(changeset)
+          details: encode_changeset_errors(changeset)
         }))
+      {:error, _} -> send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
     end
   end
 
@@ -51,6 +52,26 @@ defmodule SimpleBank.Router do
       {:ok, user} ->
         accounts = Accounts.get_user_accounts(user.id)
         send_resp(conn, 200, Jason.encode!(accounts))
+      {:error, _} ->
+        send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
+    end
+  end
+
+  post "/v1/withdrawals" do
+    case check_authorization(conn) do
+      {:ok, user} ->
+        account = Accounts.get_user_account(user.id, "BRL")
+        case Withdrawals.create_withdrawal(account.id, conn.body_params["amount"]) do
+          {:ok, wd} -> send_resp(conn, 200, Jason.encode!(wd))
+          {:error, %Ecto.Changeset{} = changeset} ->
+            send_resp(conn, 400, Jason.encode!(%{
+              details: encode_changeset_errors(changeset)
+            }))
+          {:error, %SimpleBank.Error{message: message}} ->
+            send_resp(conn, 422, Jason.encode!(%{message: message}))
+          {:error, _} ->
+            send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
+        end
       {:error, _} ->
         send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
     end

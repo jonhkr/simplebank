@@ -22,8 +22,51 @@ defmodule WithdrawalTest do
     assert wd.transaction_id != nil
     assert wd.account_id == account.id
 
-    account = Accounts.get_account(account.id)
+    updated_account = Accounts.get_account(account.id)
 
-    assert Decimal.cmp(account.balance, 900) == :eq
+    assert Decimal.cmp(updated_account.balance, Decimal.sub(account.balance, wd.amount)) == :eq
+  end
+
+  test "create withdrawal blank amount" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    {:ok, user} = Users.create_user(name, username, password)
+
+    [account] = Accounts.get_user_accounts(user.id)
+
+    {:error, changeset} = Withdrawals.create_withdrawal(account.id, nil)
+
+    errors = changeset.errors
+
+    assert [amount: {"can't be blank", [validation: :required]}] = errors
+
+    updated_account = Accounts.get_account(account.id)
+
+    assert Decimal.cmp(account.balance, updated_account.balance) == :eq
+  end
+
+  test "create withdrawal negative amount" do
+    name = "Jonas Trevisan"
+    username = "jonast"
+    password = "jonast"
+
+    {:ok, user} = Users.create_user(name, username, password)
+
+    [account] = Accounts.get_user_accounts(user.id)
+
+    {:error, changeset} = Withdrawals.create_withdrawal(account.id, -100)
+
+    errors = changeset.errors
+
+    assert [
+      amount: {"must be greater than %{number}",
+      [validation: :number, kind: :greater_than, number: 0]
+    }] = errors
+
+    updated_account = Accounts.get_account(account.id)
+
+    assert Decimal.cmp(account.balance, updated_account.balance) == :eq
   end
 end

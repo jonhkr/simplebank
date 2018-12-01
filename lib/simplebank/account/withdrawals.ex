@@ -3,9 +3,20 @@ defmodule SimpleBank.Withdrawals do
   alias SimpleBank.{Repo, Accounts, Withdrawal}
 
   def create_withdrawal(account_id, amount) do
+    changeset = Withdrawal.changeset(%Withdrawal{}, %{
+      account_id: account_id,
+      transaction_id: -1,
+      amount: amount
+    })
+    
+    create_withdrawal(changeset)
+  end
+
+  defp create_withdrawal(%Ecto.Changeset{valid?: false} = changeset), do: {:error, changeset}
+  defp create_withdrawal(%Ecto.Changeset{valid?: true, changes: changes} = changeset) do
     Repo.transaction fn ->
-      result = Accounts.debit_account(account_id, Decimal.new(amount), "withdrawal")
-      |> register_withdrawal
+      result = Accounts.debit_account(changes.account_id, changes.amount, "withdrawal")
+      |> register_withdrawal(changeset)
 
       case result do
         {:ok, wd} -> wd
@@ -13,15 +24,11 @@ defmodule SimpleBank.Withdrawals do
       end
     end
   end
-
-  defp register_withdrawal({:error, _} = error), do: error
-  defp register_withdrawal({:ok, transaction}) do
-    changeset = Withdrawal.changeset(%Withdrawal{}, %{
-      account_id: transaction.account_id,
-      transaction_id: transaction.id,
-      amount: Decimal.abs(transaction.amount)
-    })
-
-    Repo.insert(changeset)
+  
+  defp register_withdrawal({:error, _} = error, _), do: error
+  defp register_withdrawal({:ok, transaction}, changeset) do
+    changeset
+    |> Withdrawal.changeset(%{transaction_id: transaction.id})
+    |> Repo.insert()
   end
 end

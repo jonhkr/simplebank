@@ -17,5 +17,6 @@ defmodule SimpleBank.Withdrawal do
     user
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
+    |> validate_number(:amount, greater_than: 0)
   end
 end

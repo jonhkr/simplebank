@@ -30,7 +30,6 @@ defmodule AccountApiTest do
 
     conn =
       conn(:get, "/v1/accounts")
-      |> put_req_header("content-type", "application/json")
       |> put_req_header("authorization", "Bearer " <> auth_token)
       |> Router.call(@opts)
 
