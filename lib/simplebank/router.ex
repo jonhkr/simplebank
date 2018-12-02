@@ -3,7 +3,7 @@ defmodule SimpleBank.Router do
   use Plug.ErrorHandler
   require Logger
 
-  alias SimpleBank.{Users, Auth, Accounts, Withdrawals}
+  alias SimpleBank.{Users, Auth, Accounts, Withdrawals, Transfers}
 
   plug Plug.Logger
   plug Plug.RequestId
@@ -62,20 +62,55 @@ defmodule SimpleBank.Router do
     case check_authorization(conn) do
       {:ok, user} ->
         account = Accounts.get_user_account(user.id, "BRL")
-        case Withdrawals.create_withdrawal(account.id, conn.body_params["amount"]) do
+        amount = conn.body_params["amount"]
+
+        case Withdrawals.create_withdrawal(account.id, amount) do
           {:ok, wd} -> send_resp(conn, 200, Jason.encode!(wd))
+
           {:error, %Ecto.Changeset{} = changeset} ->
             send_resp(conn, 400, Jason.encode!(%{
               details: encode_changeset_errors(changeset)
             }))
+
           {:error, %SimpleBank.Error{message: message}} ->
             send_resp(conn, 422, Jason.encode!(%{message: message}))
+
           {:error, _} ->
             send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
         end
       {:error, _} ->
         send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
     end
+  end
+
+  post "/v1/transfers" do
+    case check_authorization(conn) do
+      {:ok, user} ->
+        account = Accounts.get_user_account(user.id, "BRL")
+        amount = conn.body_params["amount"]
+        destination = conn.body_params["destination"]
+
+        case Transfers.send_money(account.id, amount, destination) do
+          {:ok, transfer} -> send_resp(conn, 200, Jason.encode!(transfer))
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            send_resp(conn, 400, Jason.encode!(%{
+              details: encode_changeset_errors(changeset)
+            }))
+
+          {:error, %SimpleBank.Error{message: message}} ->
+            send_resp(conn, 422, Jason.encode!(%{message: message}))
+
+          {:error, _} ->
+            send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
+        end
+      {:error, _} ->
+        send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
+    end
+  end
+
+  match _ do
+    send_resp(conn, 404, "")
   end
 
   defp check_authorization(%Plug.Conn{} = conn) do

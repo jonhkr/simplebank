@@ -41,6 +41,13 @@ defmodule SimpleBank.Accounts do
     Repo.one(query)
   end
 
+  def get_account_by_iban(iban) do
+    query = from a in @account_query,
+      where: a.iban == ^iban
+
+    Repo.one(query)
+  end
+
   def debit_account(account_id, amount, type) do
     Repo.transaction fn ->
       query = from a in @account_query,
@@ -60,10 +67,33 @@ defmodule SimpleBank.Accounts do
     end
   end
 
+  def credit_account(account_id, amount, type) do
+    Repo.transaction fn ->
+      query = from a in @account_query,
+        where: a.id == ^account_id
+
+      account = Repo.one(query)
+
+      if is_nil(account) do
+        {:error, %Error{message: "account not found"}}
+      else
+        case create_transaction(account, positive_amount(amount), type) do
+          {:ok, transaction} -> transaction
+          {:error, error} -> Repo.rollback(error) 
+        end
+      end
+    end
+  end
+
   defp negative_amount(amount) do
     amount
     |> Decimal.abs
     |> Decimal.minus
+  end
+
+  defp positive_amount(amount) do
+    amount
+    |> Decimal.abs
   end
 
   defp create_transaction(account, amount, type) do

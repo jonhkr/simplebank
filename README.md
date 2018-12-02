@@ -166,6 +166,43 @@ curl -X POST http://localhost:3000/v1/withdrawals -H "Authorization: Bearer eyJh
 
 ### Request transfer
 
+Request:
+```
+POST /v1/transfers HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0
+Content-type: application/json
+
+{
+	"amount": "100.0",
+	"destination": "DESTINATION_IBAN"
+}
+```
+
+Response:
+```
+< HTTP/1.1 200 OK
+< cache-control: max-age=0, private, must-revalidate
+< content-length: 185
+< date: Mon, 03 Dec 2018 23:09:49 GMT
+< server: Cowboy
+< x-request-id: 2lmfapebud6ev623ak000044
+
+{
+	"id": 19,
+	"account_id": 451,
+	"transaction_id": 706,
+	"amount": "100.5",
+	"direction": "out",
+	"source": null,
+	"destination": "8e571614-fe31-4466-930f-4b8f7e5272a1",
+	"inserted_at": "2018-12-03T23:09:49"
+}
+```
+
+Curl request:
+```
+curl -X POST http://localhost:3000/v1/accounts -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0" -H "content-type: application/json" -d '{"amount": "100.0", "destination": "DESTINATION_IBAN"}' -v
+```
 
 ### Generate a report
 

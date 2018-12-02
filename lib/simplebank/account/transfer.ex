@@ -14,7 +14,7 @@ defmodule SimpleBank.Transfer do
     field :source
     field :destination
 
-    timestamps()
+    timestamps(updated_at: false)
   end
 
   @required_fields [:account_id, :transaction_id, :amount, :direction]
@@ -24,5 +24,16 @@ defmodule SimpleBank.Transfer do
     user
     |> cast(params, @required_fields ++ @optinal_fields)
     |> validate_required(@required_fields)
+    |> validate_number(:amount, greater_than: 0)
+    |> validate_inclusion(:direction, ["in", "out"])
+    |> validate_direction()
+  end
+
+  defp validate_direction(%Ecto.Changeset{valid?: false} = changeset), do: changeset
+  defp validate_direction(%Ecto.Changeset{valid?: true, changes: %{direction: direction}} = changeset) do
+    case direction do
+      "in" -> validate_required(changeset, [:source])
+      "out" -> validate_required(changeset, [:destination])
+    end
   end
 end
