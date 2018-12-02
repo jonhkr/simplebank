@@ -14,8 +14,9 @@ defmodule AccountApiTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    req_body = %{name: name, username: username, raw_password: password}
+    req_body = %{name: name, username: username, raw_password: password, email: email}
 
     conn =
       conn(:post, "/v1/users", Jason.encode!(req_body))

@@ -12,7 +12,7 @@ defmodule SimpleBank.Application do
         scheme: :http,
         plug: SimpleBank.Router,
         options: [port: 3000]),
-      SimpleBank.Repo
+      {SimpleBank.Repo, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

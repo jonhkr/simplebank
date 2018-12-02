@@ -1,6 +1,6 @@
 defmodule SimpleBank.Withdrawals do
   
-  alias SimpleBank.{Repo, Accounts, Withdrawal}
+  alias SimpleBank.{Repo, Accounts, Withdrawal, NotificationService}
 
   def create_withdrawal(account_id, amount) do
     changeset = Withdrawal.changeset(%Withdrawal{}, %{
@@ -8,8 +8,14 @@ defmodule SimpleBank.Withdrawals do
       transaction_id: -1,
       amount: amount
     })
-    
-    create_withdrawal(changeset)
+
+    case create_withdrawal(changeset) do
+      {:ok, withdrawal} = result ->
+        # publish the event only after transaction commit
+        withdrawal_created(withdrawal)
+        result
+      result -> result
+    end
   end
 
   defp create_withdrawal(%Ecto.Changeset{valid?: false} = changeset), do: {:error, changeset}
@@ -20,7 +26,8 @@ defmodule SimpleBank.Withdrawals do
 
       case result do
         {:ok, wd} -> wd
-        {:error, error} -> Repo.rollback(error)
+        {:error, error} ->
+          Repo.rollback(error)
       end
     end
   end
@@ -30,5 +37,9 @@ defmodule SimpleBank.Withdrawals do
     changeset
     |> Withdrawal.changeset(%{transaction_id: transaction.id})
     |> Repo.insert()
+  end
+
+  defp withdrawal_created(wd) do
+    NotificationService.process(:withdrawal_created, wd)
   end
 end

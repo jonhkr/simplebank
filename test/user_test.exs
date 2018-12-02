@@ -11,8 +11,9 @@ defmodule UserTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, user} = Users.create_user(name, username, password, email)
 
     assert user.name == name
     assert user.username == username
@@ -23,12 +24,13 @@ defmodule UserTest do
   test "validate user username" do
     name = "Jonas Trevisan"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, nil, password)
+    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, nil, password, email)
 
     assert [username: {"can't be blank", [validation: :required]}] = errors
 
-    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, "sh", password)
+    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, "sh", password, email)
 
     assert  [
               username: {"should be at least %{count} character(s)",
@@ -39,12 +41,13 @@ defmodule UserTest do
   test "validate user password" do
     name = "Jonas Trevisan"
     username = "jonast"
+    email = "jonast@jonast.com"
 
-    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, username, nil)
+    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, username, nil, email)
 
     assert [raw_password: {"can't be blank", [validation: :required]}] = errors
 
-    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, username, "411a")
+    {:error, %Ecto.Changeset{valid?: false, errors: errors}} = Users.create_user(name, username, "411a", email)
 
     assert  [
               raw_password: {"should be at least %{count} character(s)",
@@ -56,8 +59,9 @@ defmodule UserTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, user} = Users.create_user(name, username, password, email)
 
     {:ok, session} = Users.create_session(username, password)
 
@@ -70,8 +74,9 @@ defmodule UserTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, _} = Users.create_user(name, username, password)
+    {:ok, _} = Users.create_user(name, username, password, email)
 
     {:ok, session} = Users.create_session(username, password)
 
@@ -95,8 +100,9 @@ defmodule UserTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, user} = Users.create_user(name, username, password, email)
     {:ok, token} = Auth.authenticate(username, password)
     {:ok, user2} = Auth.validate_and_get_user(token)
 
@@ -113,8 +119,9 @@ defmodule UserTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, _} = Users.create_user(name, username, password)
+    {:ok, _} = Users.create_user(name, username, password, email)
     {:ok, token} = Auth.authenticate(username, password)
 
     Auth.revoke(token)

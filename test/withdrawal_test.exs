@@ -11,8 +11,9 @@ defmodule WithdrawalTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, user} = Users.create_user(name, username, password, email)
 
     [account] = Accounts.get_user_accounts(user.id)
 
@@ -31,8 +32,9 @@ defmodule WithdrawalTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, user} = Users.create_user(name, username, password, email)
 
     [account] = Accounts.get_user_accounts(user.id)
 
@@ -51,8 +53,9 @@ defmodule WithdrawalTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    {:ok, user} = Users.create_user(name, username, password)
+    {:ok, user} = Users.create_user(name, username, password, email)
 
     [account] = Accounts.get_user_accounts(user.id)
 

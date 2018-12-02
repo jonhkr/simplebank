@@ -14,8 +14,9 @@ defmodule WithdrawalsApiTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    user_params = %{name: name, username: username, raw_password: password}
+    user_params = %{name: name, username: username, raw_password: password, email: email}
 
     conn =
       conn(:post, "/v1/users", Jason.encode!(user_params))
@@ -52,8 +53,9 @@ defmodule WithdrawalsApiTest do
     name = "Jonas Trevisan"
     username = "jonast"
     password = "jonast"
+    email = "jonast@jonast.com"
 
-    user_params = %{name: name, username: username, raw_password: password}
+    user_params = %{name: name, username: username, raw_password: password, email: email}
 
     conn =
       conn(:post, "/v1/users", Jason.encode!(user_params))
@@ -61,8 +63,6 @@ defmodule WithdrawalsApiTest do
       |> Router.call(@opts)
 
     assert conn.status == 200
-
-    %{"id" => user_id} = Jason.decode!(conn.resp_body)
 
     {:ok, auth_token} = Auth.authenticate(username, password)
 

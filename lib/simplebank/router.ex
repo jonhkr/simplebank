@@ -23,8 +23,9 @@ defmodule SimpleBank.Router do
     name = params["name"]
     username = params["username"]
     raw_password = params["raw_password"]
+    email = params["email"]
 
-    case Users.create_user(name, username, raw_password) do
+    case Users.create_user(name, username, raw_password, email) do
       {:ok, user} -> send_resp(conn, 200, Jason.encode!(user))
       {:error, %Ecto.Changeset{} = changeset} -> 
         send_resp(conn, 400, Jason.encode!(%{

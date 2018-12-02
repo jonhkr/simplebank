@@ -27,7 +27,7 @@ defmodule SimpleBank.Auth do
           true -> {:ok, Users.get_user(claims["user_id"])}
           false -> {:error, :invalid_token}
         end
-      error -> {:error, :invalid_token}
+      _ -> {:error, :invalid_token}
     end
   end
 

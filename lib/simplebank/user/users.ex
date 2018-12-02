@@ -2,11 +2,12 @@ defmodule SimpleBank.Users do
   
   alias SimpleBank.{Repo, User, UserSession, Accounts}
 
-  def create_user(name, username, raw_password) do
+  def create_user(name, username, raw_password, email) do
     changeset = User.changeset(%User{}, %{
       name: name,
       username: username,
-      raw_password: raw_password
+      raw_password: raw_password,
+      email: email
     })
 
     create_user(changeset)

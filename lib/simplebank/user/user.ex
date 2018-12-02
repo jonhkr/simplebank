@@ -7,13 +7,16 @@ defmodule SimpleBank.User do
   schema "user" do
     field :name
     field :username
+    field :email
     field :raw_password, :string, virtual: true
     field :password_hash
 
     timestamps()
   end
 
-  @required_fields [:name, :username, :raw_password]
+  # Taken from https://gist.github.com/daemonfire300/b6705a9ce103a8bf3f70c755350ac683
+  @mail_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/
+  @required_fields [:name, :username, :raw_password, :email]
 
   def changeset(user, params \\ :empty) do
     user
@@ -21,6 +24,7 @@ defmodule SimpleBank.User do
     |> validate_required(@required_fields)
     |> validate_length(:username, min: 4, max: 100)
     |> validate_length(:raw_password, min: 6)
+    |> validate_format(:email, @mail_regex)
     |> unique_constraint(:username, name: :idx_unique_user_username)
     |> hash_password
   end
