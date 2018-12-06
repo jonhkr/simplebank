@@ -1,11 +1,5 @@
-defmodule UserTest do
-  use ExUnit.Case
-
-  alias SimpleBank.{Repo, Users, User, Auth}
-
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-  end
+defmodule SimpleBank.UserTest do
+  use SimpleBank.TestCase
 
   test "create user" do
     name = "Jonas Trevisan"

@@ -1,12 +1,5 @@
-defmodule UserApiTest do
-  use ExUnit.Case
-  use Plug.Test
-
-  alias SimpleBank.{Repo, Router, Users, Auth}
-
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-  end
+defmodule SimpleBank.UserApiTest do
+  use SimpleBank.TestCase
 
   @opts Router.init([])
 
@@ -89,9 +82,7 @@ defmodule UserApiTest do
 
     assert conn.status == 401
 
-    assert %{"message" => message} = Jason.decode!(conn.resp_body)
-
-    assert message == "Invalid credentials"
+    assert %{"message" => "invalid credentials"} = Jason.decode!(conn.resp_body)
   end
 
   test "authentication with empty username" do
@@ -104,9 +95,7 @@ defmodule UserApiTest do
 
     assert conn.status == 401
 
-    assert %{"message" => message} = Jason.decode!(conn.resp_body)
-
-    assert message == "Invalid credentials"
+    assert %{"message" => "invalid credentials"} = Jason.decode!(conn.resp_body)
   end
 
   test "authentication with empty password" do
@@ -115,7 +104,7 @@ defmodule UserApiTest do
     password = "jonast"
     email = "jonast@jonast.com"
 
-    {:ok, _} = Users.create_user(name, username, password, email)
+    {:ok, _user} = Users.create_user(name, username, password, email)
 
     req_body = %{username: username, raw_password: nil}
 
@@ -126,8 +115,6 @@ defmodule UserApiTest do
 
     assert conn.status == 401
 
-    assert %{"message" => message} = Jason.decode!(conn.resp_body)
-
-    assert message == "Invalid credentials"
+    assert %{"message" => "invalid credentials"} = Jason.decode!(conn.resp_body)
   end
 end

@@ -31,7 +31,7 @@ defmodule SimpleBank.Router do
         send_resp(conn, 400, Jason.encode!(%{
           details: encode_changeset_errors(changeset)
         }))
-      {:error, _} -> send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
+      {:error, _} -> send_resp(conn, 500, Jason.encode!(%{message: "internal error"}))
     end
   end
 
@@ -44,7 +44,7 @@ defmodule SimpleBank.Router do
       {:ok, token} -> 
         send_resp(conn, 200, Jason.encode!(%{session_token: token}))
       {:error, _} -> 
-        send_resp(conn, 401, Jason.encode!(%{message: "Invalid credentials"}))
+        send_resp(conn, 401, Jason.encode!(%{message: "invalid credentials"}))
     end
   end
 
@@ -54,7 +54,7 @@ defmodule SimpleBank.Router do
         accounts = Accounts.get_user_accounts(user.id)
         send_resp(conn, 200, Jason.encode!(accounts))
       {:error, _} ->
-        send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
+        send_resp(conn, 401, Jason.encode!(%{message: "unauthorized"}))
     end
   end
 
@@ -76,10 +76,10 @@ defmodule SimpleBank.Router do
             send_resp(conn, 422, Jason.encode!(%{message: message}))
 
           {:error, _} ->
-            send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
+            send_resp(conn, 500, Jason.encode!(%{message: "internal error"}))
         end
       {:error, _} ->
-        send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
+        send_resp(conn, 401, Jason.encode!(%{message: "unauthorized"}))
     end
   end
 
@@ -102,15 +102,34 @@ defmodule SimpleBank.Router do
             send_resp(conn, 422, Jason.encode!(%{message: message}))
 
           {:error, _} ->
-            send_resp(conn, 500, Jason.encode!(%{message: "Internal error"}))
+            send_resp(conn, 500, Jason.encode!(%{message: "internal error"}))
         end
       {:error, _} ->
-        send_resp(conn, 401, Jason.encode!(%{message: "Unauthorized"}))
+        send_resp(conn, 401, Jason.encode!(%{message: "unauthorized"}))
     end
   end
 
+  get "/v1/reports" do
+    case check_authorization(conn) do
+      {:ok, user} ->
+        account = Accounts.get_user_account(user.id, "BRL")
+        type = conn.params["type"]
+        start_date = conn.params["start_date"]
+        end_date = conn.params["end_date"]
+
+        case Accounts.generate_report(type, account.id, start_date, end_date) do
+          {:ok, report} -> send_resp(conn, 200, Jason.encode!(report))
+          {:error, %SimpleBank.Error{message: message}} ->
+            send_resp(conn, 422, Jason.encode!(%{message: message}))
+          {:error, _} ->
+            send_resp(conn, 500, Jason.encode!(%{message: "internal error"}))
+        end
+      {:error, _} ->
+        send_resp(conn, 401, Jason.encode!(%{message: "unauthorized"}))
+    end
+  end
   match _ do
-    send_resp(conn, 404, "")
+    send_resp(conn, 404, Jason.encode!(%{message: "not found"}))
   end
 
   defp check_authorization(%Plug.Conn{} = conn) do

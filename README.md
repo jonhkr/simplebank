@@ -206,6 +206,36 @@ curl -X POST http://localhost:3000/v1/accounts -H "Authorization: Bearer eyJhbGc
 
 ### Generate a report
 
+Request:
+```
+GET /v1/reports?type=summary&start_date=2018-11-01&end_date=2018-12-25
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0
+```
+
+Response:
+```
+< HTTP/1.1 200 OK
+< cache-control: max-age=0, private, must-revalidate
+< content-length: 185
+< date: Mon, 03 Dec 2018 23:09:49 GMT
+< server: Cowboy
+< x-request-id: 2lmfapebud6ev623ak000044
+
+{
+	"transaction_count": 3,
+	"credit_count": 1,
+	"debit_count": 2
+	"credit_amount": "100.5",
+	"debit_amount": "200",
+	"start_date": "2018-11-01",
+	"end_date": "2018-12-25"
+}
+```
+
+Curl Request:
+```
+curl -X GET "http://localhost:3000/v1/reports?type=summary&start_date=2018-12-25&end_date=2018-12-25" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE1OSwidXNlcl9pZCI6MjgwLCJleHAiOjE1NDM0NTk4ODcsImlhdCI6MTU0MzQ1MjY4NywianRpIjoiMmxsbjQya2kwcnNwOHB2b3FjMDAwMDEyIiwibmJmIjoxNTQzNDUyNjg3fQ.HxdfL0ez9tEK9UXPWaAG598BBW5d7MfPdb4wok5qtG0"
+```
 
 ## Running
 

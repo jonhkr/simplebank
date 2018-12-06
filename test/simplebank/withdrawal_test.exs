@@ -1,21 +1,10 @@
-defmodule WithdrawalTest do
-  use ExUnit.Case
-
-  alias SimpleBank.{Repo, Users, Accounts, Withdrawals}
-
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-  end
+defmodule SimpleBank.WithdrawalTest do
+  use SimpleBank.TestCase
 
   test "create withdrawal" do
-    name = "Jonas Trevisan"
-    username = "jonast"
-    password = "jonast"
-    email = "jonast@jonast.com"
+    {:ok, user, _username, _password} = create_user()
 
-    {:ok, user} = Users.create_user(name, username, password, email)
-
-    [account] = Accounts.get_user_accounts(user.id)
+    account = Accounts.get_user_account(user.id, "BRL")
 
     {:ok, wd} = Withdrawals.create_withdrawal(account.id, 100)
 
@@ -29,14 +18,9 @@ defmodule WithdrawalTest do
   end
 
   test "create withdrawal blank amount" do
-    name = "Jonas Trevisan"
-    username = "jonast"
-    password = "jonast"
-    email = "jonast@jonast.com"
+    {:ok, user, _username, _password} = create_user()
 
-    {:ok, user} = Users.create_user(name, username, password, email)
-
-    [account] = Accounts.get_user_accounts(user.id)
+    account = Accounts.get_user_account(user.id, "BRL")
 
     {:error, changeset} = Withdrawals.create_withdrawal(account.id, nil)
 
@@ -50,14 +34,9 @@ defmodule WithdrawalTest do
   end
 
   test "create withdrawal negative amount" do
-    name = "Jonas Trevisan"
-    username = "jonast"
-    password = "jonast"
-    email = "jonast@jonast.com"
+    {:ok, user, _username, _password} = create_user()
 
-    {:ok, user} = Users.create_user(name, username, password, email)
-
-    [account] = Accounts.get_user_accounts(user.id)
+    account = Accounts.get_user_account(user.id, "BRL")
 
     {:error, changeset} = Withdrawals.create_withdrawal(account.id, -100)
 

@@ -85,6 +85,70 @@ defmodule SimpleBank.Accounts do
     end
   end
 
+  def generate_report("summary", account_id, start_date, end_date) do
+    with {:ok, start_date_time, end_date_time} <- parse_report_dates(start_date, end_date) do
+      query = from t in Transaction,
+        where: t.account_id == ^account_id and
+          t.inserted_at >= ^start_date_time and
+          t.inserted_at <= ^end_date_time,
+        select: t
+
+      Repo.transaction fn ->
+        # We could aggregate this in using a database query
+        # but it is preferable to give this task to the application
+        # to reduce the database load.
+        # The stream could be parallelized to make the computation faster
+        Repo.stream(query)
+        |> Enum.reduce(%{
+          transaction_count: 0,
+          credit_count: 0,
+          debit_count: 0,
+          credit_amount: Decimal.new(0),
+          debit_amount: Decimal.new(0),
+          start_date: NaiveDateTime.to_date(start_date_time),
+          end_date: NaiveDateTime.to_date(end_date_time)
+        }, fn t, acc ->
+          case t.amount.sign do
+            +1 ->
+              acc
+              |> Map.update!(:credit_count, &(&1 + 1))
+              |> Map.update!(:credit_amount, &(Decimal.add(&1, t.amount)))
+            -1 ->
+              acc
+              |> Map.update!(:debit_count, &(&1 + 1))
+              |> Map.update!(:debit_amount, &(Decimal.add(&1, Decimal.abs(t.amount))))
+          end
+          |> Map.update!(:transaction_count, &(&1 + 1))
+        end)
+      end
+    end
+  end
+  def generate_report(type, _account_id, _start_date, _end_date) do
+    {:error, %Error{message: "unknown report type #{type}"}}
+  end
+
+  defp parse_report_dates(nil, _), do: {:error, %Error{message: "start date is required"}}
+  defp parse_report_dates(_, nil), do: {:error, %Error{message: "end date is required"}}
+  defp parse_report_dates(start_date_s, end_date_s) do
+     with(
+      {:ok, start_date} <- Date.from_iso8601(start_date_s),
+      {:ok, start_date_time} = NaiveDateTime.new(start_date, ~T[00:00:00.000]),
+      {:ok, end_date} <- Date.from_iso8601(end_date_s),
+      {:ok, end_date_time} = NaiveDateTime.new(end_date, ~T[23:59:59.999])
+      ) do
+
+      if NaiveDateTime.diff(start_date_time, end_date_time) <= 0 do
+        {:ok, start_date_time, end_date_time}
+      else
+        {:error, %Error{message: "start date should be before end date"}}
+      end
+    else
+      {:error, :invalid_format} -> {:error, %Error{message: "invalid date format"}}
+      {:error, :invalid_date} -> {:error, %Error{message: "invalid date"}}
+      error -> error
+    end
+  end
+
   defp negative_amount(amount) do
     amount
     |> Decimal.abs
