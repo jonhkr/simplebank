@@ -19,6 +19,9 @@ kubectl create secret generic simplebank-mysql-pass --from-file=password.txt
 # Create the mysql deployment
 kubectl create -f kubernetes/mysql-deployment.yaml
 
+# Create the database for the service
+kubectl run -it --rm --image=mysql:5.6 --restart=Never mysql-client -- mysql -h simplebank-mysql -pfoo -e "create database simplebank_prod"
+
 # Configure the service
 cp kubernetes/config.toml.sample config.toml
 
@@ -31,6 +34,15 @@ kubectl create secret generic simplebank-config --from-file=config.toml
 
 # Deploy the SimpleBank service
 kubectl create -f kubernetes/simplebank-deployment.yaml
+
+# Wait for all pods to be created (their status should be `Running`)
+kubectl get pods --watch
+
+# To apply the migrations we need to connect to one of the pods
+kubectl exec -it $(kubectl get pods --selector=app=simplebank --selector=tier=frontend -o jsonpath='{.items[0].metadata.name}') -- /bin/bash
+
+# Then run the migrate command
+bin/simplebank migrate
 ```
 
 Use this command to list all services running on minikube
