@@ -1,0 +1,9 @@
+[simplebank."SimpleBank.Repo"]
+database = "simplebank_prod"
+username = "root"
+password = "foo"
+hostname = "simplebank-mysql"
+port = 3306
+
+[simplebank]
+auth_session_signer = "foobar"
