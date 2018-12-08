@@ -1,0 +1,14 @@
+use Mix.Config
+
+config :simplebank, SimpleBank.Repo,
+  database: "simplebank_dev",
+  username: "root",
+  password: "",
+  hostname: "localhost",
+  port: "3306"
+
+config :bcrypt_elixir, log_rounds: 4
+
+config :simplebank, auth_session_signer: "dev"
+
+config :simplebank, port: 4000

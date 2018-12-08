@@ -11,7 +11,7 @@ This guide uses Minikube, follow [this guide](https://kubernetes.io/docs/setup/m
 
 Use these commands to setup the SimpleBank service on Kubernetes.
 
-``` bash
+```sh
 # Create a secret to store the mysql password
 echo -n "foo" > ./password.txt
 kubectl create secret generic simplebank-mysql-pass --from-file=password.txt
@@ -46,11 +46,11 @@ bin/simplebank migrate
 ```
 
 Use this command to list all services running on minikube
-```
+```sh
 minikube service list
 ```
 This should return a table like this:
-```
+```sh
 |-------------|----------------------|-----------------------------|
 |  NAMESPACE  |         NAME         |             URL             |
 |-------------|----------------------|-----------------------------|
