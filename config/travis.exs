@@ -10,6 +10,6 @@ config :simplebank, SimpleBank.Repo,
 
 config :bcrypt_elixir, log_rounds: 4
 
-config :joken, default_signer: "travis"
+config :simplebank, auth_session_signer: "travis"
 
 config :simplebank, port: 3333
