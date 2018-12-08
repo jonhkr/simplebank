@@ -27,3 +27,7 @@ simplebank-*.tar
 # Ignore deploy config files
 password.txt
 config.toml
+
+# Ignore test and dev config files
+config/test.exs
+config/dev.exs
