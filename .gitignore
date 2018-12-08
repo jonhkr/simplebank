@@ -23,3 +23,7 @@ erl_crash.dump
 simplebank-*.tar
 
 .DS_Store
+
+# Ignore deploy config files
+password.txt
+config.toml
