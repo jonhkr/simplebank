@@ -16,10 +16,10 @@ Users can generate a report of their transactions filtering by period.
 
 ## Running
 
-Follow the kubernetes deployment guide [here](../blob/master/kubernetes/README.md).
+Follow the kubernetes deployment guide [here](kubernetes/README.md).
 
 ## Monitoring
 
 ## API Specification
 
-[Here](../blob/master/docs/api-spec.md)
+[Here](docs/api-spec.md)
