@@ -34,7 +34,6 @@ spec:
       containers:
       - name: simplebank
         image: jonhkr/simplebank:latest
-        imagePullPolicy: Never
         ports:
         - containerPort: 3000
         volumeMounts:

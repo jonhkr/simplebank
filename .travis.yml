@@ -3,6 +3,7 @@ elixir: '1.7.4'
 otp_release: '21.0'
 services:
   - mysql
+  - docker
 
 env:
   - MIX_ENV=travis
@@ -10,6 +11,12 @@ env:
 before_script:
   - mix ecto.create
   - mix ecto.migrate
+
+deploy:
+  provider: script
+  script: bash docker_push.sh
+  on:
+    branch: master
 
 cache:
   directories:
