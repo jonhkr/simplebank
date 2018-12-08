@@ -9,4 +9,7 @@ config :simplebank, SimpleBank.Repo,
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :bcrypt_elixir, log_rounds: 4
+
 config :joken, default_signer: "test"
+
+config :simplebank, port: 3333
