@@ -38,11 +38,8 @@ kubectl create -f kubernetes/simplebank-deployment.yaml
 # Wait for all pods to be created (their status should be `Running`)
 kubectl get pods --watch
 
-# To apply the migrations we need to connect to one of the pods
-kubectl exec -it $(kubectl get pods --selector=app=simplebank --selector=tier=frontend -o jsonpath='{.items[0].metadata.name}') -- /bin/bash
-
-# Then run the migrate command
-bin/simplebank migrate
+# Apply the migrations
+kubectl exec -it $(kubectl get pods --selector=app=simplebank --selector=tier=frontend -o jsonpath='{.items[0].metadata.name}') -- /app/bin/simplebank migrate
 ```
 
 Use this command to list all services running on minikube
@@ -63,4 +60,3 @@ This should return a table like this:
 ```
 
 In this example, the service is accessible through the address `http://192.168.99.100:30170`
-

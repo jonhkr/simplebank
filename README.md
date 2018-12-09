@@ -164,6 +164,32 @@ Follow the kubernetes deployment guide [here](kubernetes/README.md).
 
 ## Monitoring
 
+The application comes with a built in logstash backend. To use it configure the `logstash` backend:
+
+```elixir
+config :logger, :logstash,
+  host: "logstash-host",
+  port: 10001,
+  type: "app"
+```
+
+When running on docker the configuration must be set in the `config.toml` file, for example:
+
+```toml
+[logger.logstash]
+host = "simplebank-logstash"
+port = 10001
+type = "app"
+```
+
+To setup Kibana + Elasticsearch + Logstash on Minikube, run:
+
+```sh
+kubectl apply -f kubernetes/kibana-deployment.yaml
+```
+
+The logstash service will be mapped to `simplebank-logstash` hostname and port `10001`.
+
 ## API Specification
 
 [Here](docs/api-spec.md)
