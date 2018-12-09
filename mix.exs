@@ -14,7 +14,7 @@ defmodule SimpleBank.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :plug_cowboy, :statix],
+      extra_applications: [:logger, :plug_cowboy],
       mod: {SimpleBank.Application, []}
     ]
   end
@@ -29,7 +29,6 @@ defmodule SimpleBank.MixProject do
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 1.1"},
       {:joken, "~> 2.0-rc3"},
-      {:statix, "~> 1.1"},
       {:distillery, "~> 2.0"},
       {:toml, "~> 0.5"},
     ]

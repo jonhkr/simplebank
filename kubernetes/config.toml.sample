@@ -7,3 +7,9 @@ port = 3306
 
 [simplebank]
 auth_session_signer = "foobar"
+
+# Uncomment if using logstash backend
+# [logger.logstash]
+# host = "simplebank-logstash"
+# port = 10001
+# type = "app"

@@ -8,8 +8,6 @@ defmodule SimpleBank.Application do
   require Logger
 
   def start(_type, _args) do
-    :ok = SimpleBank.Statix.connect()
-
     # List all child processes to be supervised
     children = [
       Plug.Cowboy.child_spec(
