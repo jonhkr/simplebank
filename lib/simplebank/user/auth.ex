@@ -10,13 +10,8 @@ defmodule SimpleBank.Auth do
   end
 
   def authenticate(username, raw_password) do
-    case Users.create_session(username, raw_password) do
-      {:ok, session} ->
-        {:ok, generate_and_sign!(%{
-          user_id: session.user_id,
-          sub: session.id
-        }, get_signer())}
-      error -> error
+    with {:ok, session} <- Users.create_session(username, raw_password) do
+      {:ok, generate_and_sign!(%{user_id: session.user_id, sub: session.id}, get_signer())}
     end
   end
 
