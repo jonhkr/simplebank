@@ -1,5 +1,7 @@
 # SimpleBank
 
+[![Build Status](https://travis-ci.org/jonhkr/simplebank.svg?branch=master)](https://travis-ci.org/jonhkr/simplebank)
+
 A simple bank API written in Elixir.
 
 ## Features
