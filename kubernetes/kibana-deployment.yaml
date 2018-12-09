@@ -1,0 +1,150 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: logstash-config
+  namespace: default
+data:
+  pipeline.conf: |-
+    input {
+      udp {
+        codec => json
+        port => 10001
+        queue_size => 1000
+        workers => 2
+        type => default_log_type
+      }
+    }
+    output {
+      stdout {}
+      elasticsearch { hosts => ["simplebank-elasticsearch:9200"] }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simplebank-logstash
+  labels:
+    app: simplebank
+spec:
+  ports:
+    - port: 10001
+      protocol: UDP
+  selector:
+    app: simplebank
+    tier: logstash
+  clusterIP: None
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: simplebank-logstash
+  labels:
+    app: simplebank
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: simplebank
+        tier: logstash
+    spec:
+      containers:
+      - image: docker.elastic.co/logstash/logstash:6.5.1
+        name: logstash
+        env:
+        - name: "xpack.monitoring.elasticsearch.url"
+          value: "http://simplebank-elasticsearch:9200"
+        ports:
+        - containerPort: 10001
+          protocol: UDP
+          name: sb-logstash
+        volumeMounts:
+        - name: pipeline
+          mountPath: /usr/share/logstash/pipeline
+      volumes:
+      - name: pipeline
+        configMap:
+          name: logstash-config
+          items:
+          - key: pipeline.conf
+            path: pipeline.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simplebank-elasticsearch
+  labels:
+    app: simplebank
+spec:
+  ports:
+    - port: 9200
+  selector:
+    app: simplebank
+    tier: elasticsearch
+  clusterIP: None
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: simplebank-elasticsearch
+  labels:
+    app: simplebank
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: simplebank
+        tier: elasticsearch
+    spec:
+      containers:
+      - image: docker.elastic.co/elasticsearch/elasticsearch:6.5.2
+        name: elasticsearch
+        env:
+        - name: "discovery.type"
+          value: "single-node"
+        ports:
+        - containerPort: 9200
+          name: sb-elastics
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simplebank-kibana-lb
+  labels:
+    app: simplebank
+spec:
+  ports:
+    - port: 5601
+      targetPort: 5601
+  selector:
+    app: simplebank
+    tier: kibana
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: simplebank-kibana
+  labels:
+    app: simplebank
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: simplebank
+        tier: kibana
+    spec:
+      containers:
+      - image: docker.elastic.co/kibana/kibana:6.5.2
+        name: kibana
+        env:
+        - name: ELASTICSEARCH_URL
+          value: http://simplebank-elasticsearch:9200
+        ports:
+        - containerPort: 5601
+          name: sb-kibana
