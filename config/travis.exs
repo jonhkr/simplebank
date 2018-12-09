@@ -13,3 +13,6 @@ config :bcrypt_elixir, log_rounds: 4
 config :simplebank, auth_session_signer: "travis"
 
 config :simplebank, port: 3333
+
+config :logger, :console,
+  level: :error

@@ -21,7 +21,6 @@ defmodule SimpleBank.LogstashBackendTest do
   @backend {SimpleBank.Logger.LogstashBackend, :logstash}
   Logger.add_backend @backend
 
-
   setup do
     Logger.configure_backend(@backend, [
       host: "127.0.0.1",
